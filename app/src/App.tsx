@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { useState, useEffect, useCallback } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
@@ -12,6 +13,7 @@ const PROGRAM_ID = new PublicKey('AZuXHBmsM91NMd2Ws6ovfknB32x2VQnmsKQ66J68nFHn')
 function App() {
   const { connection } = useConnection();
   const { publicKey, wallet } = useWallet();
+  const [hasAccount, setHasAccount] = useState<boolean>(false);
   const [stakedAmount, setStakedAmount] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -36,10 +38,12 @@ function App() {
       );
 
       const account = await (program.account as any).stakeAccount.fetch(pdaAccount);
+      setHasAccount(true);
       setStakedAmount(account.stakedAmount.toNumber() / LAMPORTS_PER_SOL);
       setTotalPoints(account.totalPoints.toNumber() / 1_000_000);
     } catch (e) {
       console.log("Account not found or error fetching", e);
+      setHasAccount(false);
       setStakedAmount(0);
       setTotalPoints(0);
     }
@@ -77,9 +81,10 @@ function App() {
 
       await fetchAccount();
       alert("Staking account created!");
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Error creating account");
+      const errorMsg = e.message || "Unknown error";
+      alert("Error creating account: " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -111,9 +116,10 @@ function App() {
       setStakeInput('');
       await fetchAccount();
       alert("Staked successfully!");
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Error staking");
+      const errorMsg = e.message || "Unknown error";
+      alert("Error staking: " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -145,9 +151,10 @@ function App() {
       setUnstakeInput('');
       await fetchAccount();
       alert("Unstaked successfully!");
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Error unstaking");
+      const errorMsg = e.message || "Unknown error";
+      alert("Error unstaking: " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -176,9 +183,10 @@ function App() {
 
       await fetchAccount();
       alert("Points claimed!");
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Error claiming points");
+      const errorMsg = e.message || "Unknown error";
+      alert("Error claiming points: " + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -188,7 +196,10 @@ function App() {
     <div className="app-container">
       <div className="content-wrapper">
         <header className="header">
-          <h1 className="logo">SOL Staking</h1>
+          <div className="logo-container">
+            <h1 className="logo">SOL Staking</h1>
+            <span className="network-badge">Devnet</span>
+          </div>
           <WalletMultiButton />
         </header>
 
@@ -218,7 +229,7 @@ function App() {
 
             {/* Actions Card */}
             <div className="actions-stack">
-              {stakedAmount === 0 && totalPoints === 0 ? (
+              {!hasAccount ? (
                 <div className="card">
                   <h3 className="card-title">Get Started</h3>
                   <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>

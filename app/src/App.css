@@ -210,6 +210,25 @@ input:focus {
   max-width: 400px;
 }
 
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.network-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--accent);
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  display: inline-block;
+  align-self: flex-start;
+}
+
 .footer {
   margin-top: 5rem;
   color: var(--text-muted);
